@@ -3,7 +3,7 @@
 # Env vars: APP_NAME (process display name), OUT (output PNG path)
 set -euo pipefail
 
-APP_NAME="${APP_NAME:-Receptacle}"
+export APP_NAME="${APP_NAME:-Receptacle}"
 OUT="${OUT:-/tmp/peek.png}"
 
 # Use a Swift one-liner (compiled to cache on first run) to find the window ID.
