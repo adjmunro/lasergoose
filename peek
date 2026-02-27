@@ -1,0 +1,97 @@
+#!/usr/bin/env zsh
+# peek — reusable GUI feedback loop
+# Captures a running app's window, optionally building first.
+# Repo: ~/Developer/peekaboo/
+set -euo pipefail
+
+SCRIPT_DIR="${0:A:h}"
+
+# ── Defaults (overridable via env vars) ──────────────────────────────────────
+APP="${PEEK_APP:-Receptacle}"
+PLATFORM="${PEEK_PLATFORM:-macos}"
+BUILD="${PEEK_BUILD:-none}"
+SCHEME="${PEEK_SCHEME:-}"
+PROJECT="${PEEK_PROJECT:-}"
+OUT="${PEEK_OUT:-/tmp/peek.png}"
+HOT=false
+
+# ── Argument parsing ─────────────────────────────────────────────────────────
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --app)      APP="$2";      shift 2 ;;
+    --platform) PLATFORM="$2"; shift 2 ;;
+    --build)    BUILD="$2";    shift 2 ;;
+    --scheme)   SCHEME="$2";   shift 2 ;;
+    --project)  PROJECT="$2";  shift 2 ;;
+    --out)      OUT="$2";      shift 2 ;;
+    --hot)      HOT=true;      shift   ;;
+    -h|--help)
+      cat <<'HELP'
+Usage: peek [OPTIONS]
+
+Options:
+  --app      <name>                App/process display name  (default: $PEEK_APP or "Receptacle")
+  --platform <macos|ios-sim|android>  Capture method         (default: $PEEK_PLATFORM or "macos")
+  --build    <xcode|spm|gradle|none>  Build before capture   (default: none)
+  --scheme   <name>                Xcode scheme (for xcode build)
+  --project  <path>                .xcodeproj or .xcworkspace path
+  --hot                            Use hot-reload instead of full build
+  --out      <path>                Output PNG path            (default: /tmp/peek.png)
+
+Environment variables:
+  PEEK_APP, PEEK_PLATFORM, PEEK_BUILD, PEEK_SCHEME, PEEK_PROJECT, PEEK_OUT
+
+Examples:
+  peek --app Receptacle --platform macos
+  peek --app Receptacle --platform macos --build xcode --scheme ReceptacleApp \
+       --project ~/Developer/Receptacle/Receptacle/Receptacle.xcodeproj
+  peek --app MyAndroidApp --platform android --build gradle
+  peek --platform ios-sim
+HELP
+      exit 0
+      ;;
+    *) echo "peek: unknown option: $1" >&2; exit 1 ;;
+  esac
+done
+
+# ── Step 1: Build (optional) ─────────────────────────────────────────────────
+if [[ "$HOT" == true ]]; then
+  echo "peek: hot-reload requested"
+  case "$BUILD" in
+    xcode|none)
+      echo "peek: sending hot-reload keystroke to Xcode…"
+      osascript \
+        -e 'tell application "Xcode" to activate' \
+        -e 'tell application "System Events" to keystroke "r" using {command down, control down}'
+      sleep 1
+      ;;
+    gradle)
+      echo "peek: Android hot-reload stub — app must handle com.your.app.RELOAD broadcast"
+      "$HOME/Library/Android/sdk/platform-tools/adb" shell \
+        am broadcast -a com.your.app.RELOAD || true
+      ;;
+  esac
+elif [[ "$BUILD" != "none" ]]; then
+  echo "peek: building via $BUILD…"
+  export PEEK_SCHEME="$SCHEME"
+  export PEEK_PROJECT="$PROJECT"
+  case "$BUILD" in
+    xcode)  bash "$SCRIPT_DIR/builds/xcode.sh"  ;;
+    spm)    bash "$SCRIPT_DIR/builds/spm.sh"    ;;
+    gradle) bash "$SCRIPT_DIR/builds/gradle.sh" ;;
+    *) echo "peek: unknown build type: $BUILD" >&2; exit 1 ;;
+  esac
+fi
+
+# ── Step 2: Capture ──────────────────────────────────────────────────────────
+echo "peek: capturing $APP on $PLATFORM → $OUT"
+export APP_NAME="$APP"
+export OUT="$OUT"
+case "$PLATFORM" in
+  macos)     bash "$SCRIPT_DIR/platforms/macos.sh"   ;;
+  ios-sim)   bash "$SCRIPT_DIR/platforms/ios-sim.sh" ;;
+  android)   bash "$SCRIPT_DIR/platforms/android.sh" ;;
+  *) echo "peek: unknown platform: $PLATFORM" >&2; exit 1 ;;
+esac
+
+echo "peek: saved → $OUT"
