@@ -22,7 +22,7 @@ else
   PROJ_FLAG="-project"
 fi
 
-echo "peek/xcode: building $SCHEME…"
+echo "peek/xcode: building $SCHEME..."
 xcodebuild build \
   "$PROJ_FLAG" "$PROJECT" \
   -scheme "$SCHEME" \

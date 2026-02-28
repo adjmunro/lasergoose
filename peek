@@ -14,6 +14,7 @@ SCHEME="${PEEK_SCHEME:-}"
 PROJECT="${PEEK_PROJECT:-}"
 OUT="${PEEK_OUT:-/tmp/peek.png}"
 HOT=false
+SCRIPT=""
 
 # ── Argument parsing ─────────────────────────────────────────────────────────
 while [[ $# -gt 0 ]]; do
@@ -25,6 +26,7 @@ while [[ $# -gt 0 ]]; do
     --project)  PROJECT="$2";  shift 2 ;;
     --out)      OUT="$2";      shift 2 ;;
     --hot)      HOT=true;      shift   ;;
+    --script)   SCRIPT="$2";   shift 2 ;;
     -h|--help)
       cat <<'HELP'
 Usage: peek [OPTIONS]
@@ -37,6 +39,7 @@ Options:
   --project  <path>                .xcodeproj or .xcworkspace path
   --hot                            Use hot-reload instead of full build
   --out      <path>                Output PNG path            (default: /tmp/peek.png)
+  --script   <applescript>         osascript to run before capture (e.g. click, keystroke)
 
 Environment variables:
   PEEK_APP, PEEK_PLATFORM, PEEK_BUILD, PEEK_SCHEME, PEEK_PROJECT, PEEK_OUT
@@ -81,6 +84,13 @@ elif [[ "$BUILD" != "none" ]]; then
     gradle) bash "$SCRIPT_DIR/builds/gradle.sh" ;;
     *) echo "peek: unknown build type: $BUILD" >&2; exit 1 ;;
   esac
+fi
+
+# ── Step 1.5: Run osascript (optional) ───────────────────────────────────────
+if [[ -n "$SCRIPT" ]]; then
+  echo "peek: running script…"
+  osascript -e "$SCRIPT"
+  sleep 0.4
 fi
 
 # ── Step 2: Capture ──────────────────────────────────────────────────────────
