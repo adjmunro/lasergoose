@@ -1,0 +1,1 @@
+- You MUST update the README after any change that affects it, including maintaining install instructions, usage, and a list of dependencies and what they're used for.

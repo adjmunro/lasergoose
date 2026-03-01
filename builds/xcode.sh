@@ -1,17 +1,17 @@
 #!/usr/bin/env zsh
 # builds/xcode.sh — incremental Xcode build
-# Env vars: PEEK_PROJECT (.xcodeproj/.xcworkspace path), PEEK_SCHEME (scheme name)
+# Env vars: LASERGOOSE_PROJECT (.xcodeproj/.xcworkspace path), LASERGOOSE_SCHEME (scheme name)
 set -euo pipefail
 
-PROJECT="${PEEK_PROJECT:-}"
-SCHEME="${PEEK_SCHEME:-}"
+PROJECT="${LASERGOOSE_PROJECT:-}"
+SCHEME="${LASERGOOSE_SCHEME:-}"
 
 if [[ -z "$PROJECT" ]]; then
-  echo "peek/xcode: --project is required for xcode builds" >&2
+  echo "lasergoose/xcode: --project is required for xcode builds" >&2
   exit 1
 fi
 if [[ -z "$SCHEME" ]]; then
-  echo "peek/xcode: --scheme is required for xcode builds" >&2
+  echo "lasergoose/xcode: --scheme is required for xcode builds" >&2
   exit 1
 fi
 
@@ -22,7 +22,7 @@ else
   PROJ_FLAG="-project"
 fi
 
-echo "peek/xcode: building $SCHEME..."
+echo "lasergoose/xcode: building $SCHEME..."
 xcodebuild build \
   "$PROJ_FLAG" "$PROJECT" \
   -scheme "$SCHEME" \

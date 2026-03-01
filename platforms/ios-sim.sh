@@ -3,7 +3,7 @@
 # Env vars: OUT (output PNG path)
 set -euo pipefail
 
-OUT="${OUT:-/tmp/peek.png}"
+OUT="${OUT:-/tmp/lasergoose.png}"
 
 # Verify a simulator is booted
 BOOTED=$(xcrun simctl list devices booted --json 2>/dev/null \
@@ -12,9 +12,9 @@ BOOTED=$(xcrun simctl list devices booted --json 2>/dev/null \
     print(devs[0]['name'] if devs else '')" 2>/dev/null || true)
 
 if [[ -z "$BOOTED" ]]; then
-  echo "peek/ios-sim: no booted simulator found — boot one first" >&2
+  echo "lasergoose/ios-sim: no booted simulator found — boot one first" >&2
   exit 1
 fi
 
-echo "peek/ios-sim: capturing simulator '$BOOTED' → $OUT"
+echo "lasergoose/ios-sim: capturing simulator '$BOOTED' → $OUT"
 xcrun simctl io booted screenshot "$OUT"

@@ -3,8 +3,8 @@
 # Env vars: APP_NAME (process display name), OUT (output PNG path)
 set -euo pipefail
 
-export APP_NAME="${APP_NAME:-Receptacle}"
-OUT="${OUT:-/tmp/peek.png}"
+export APP_NAME="${APP_NAME:-ThunderSloth}"
+OUT="${OUT:-/tmp/lasergoose.png}"
 
 # Find the window ID + bounds of the largest window owned by APP_NAME (layer 0).
 # Picking the largest avoids tiny AeroSpace management windows that share the name.
@@ -13,10 +13,10 @@ WINDOW_INFO=$(swift - << 'SWIFT'
 import CoreGraphics
 import Foundation
 
-let name = ProcessInfo.processInfo.environment["APP_NAME"] ?? "Receptacle"
+let name = ProcessInfo.processInfo.environment["APP_NAME"] ?? "ThunderSloth"
 let opts = CGWindowListOption([.optionAll])
 guard let list = CGWindowListCopyWindowInfo(opts, 0) as? [[String: Any]] else {
-    fputs("peek/macos: could not read window list\n", stderr); exit(1)
+    fputs("lasergoose/macos: could not read window list\n", stderr); exit(1)
 }
 
 var bestWID: CGWindowID? = nil
@@ -41,7 +41,7 @@ for w in list {
 }
 
 guard let wid = bestWID else {
-    fputs("peek/macos: no window found for '\(name)'\n", stderr); exit(1)
+    fputs("lasergoose/macos: no window found for '\(name)'\n", stderr); exit(1)
 }
 print("\(wid) \(bestBounds.x) \(bestBounds.y) \(bestBounds.w) \(bestBounds.h)")
 SWIFT
@@ -54,11 +54,11 @@ WIN_W=$(echo "$WINDOW_INFO" | awk '{print $4}')
 WIN_H=$(echo "$WINDOW_INFO" | awk '{print $5}')
 
 if [[ -z "$WID" ]]; then
-  echo "peek/macos: failed to find window for '$APP_NAME'" >&2
+  echo "lasergoose/macos: failed to find window for '$APP_NAME'" >&2
   exit 1
 fi
 
-echo "peek/macos: window ID $WID for '$APP_NAME' (${WIN_W}×${WIN_H} at ${WIN_X},${WIN_Y})"
+echo "lasergoose/macos: window ID $WID for '$APP_NAME' (${WIN_W}×${WIN_H} at ${WIN_X},${WIN_Y})"
 
 # Activate the app so it sits on top before the region capture.
 # (Avoids other windows bleeding into the screenshot when using -R.)

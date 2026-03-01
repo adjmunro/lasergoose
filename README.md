@@ -1,4 +1,4 @@
-# peekaboo
+# lasergoose
 
 Reusable GUI feedback loop for Claude Code. Captures any running app's window, analyses it, and iterates — without manual screenshots or third-party tools.
 
@@ -12,27 +12,27 @@ Works across:
 
 ```zsh
 # Make scripts executable
-chmod +x ~/Developer/peekaboo/peek
-chmod +x ~/Developer/peekaboo/platforms/*.sh
-chmod +x ~/Developer/peekaboo/builds/*.sh
+chmod +x ~/Developer/lasergoose/lasergoose
+chmod +x ~/Developer/lasergoose/platforms/*.sh
+chmod +x ~/Developer/lasergoose/builds/*.sh
 
 # Optional: add to PATH
-echo 'export PATH="$HOME/Developer/peekaboo:$PATH"' >> ~/.zshrc
+echo 'export PATH="$HOME/Developer/lasergoose:$PATH"' >> ~/.zshrc
 ```
 
 ## Usage
 
 ```
-peek [OPTIONS]
+lasergoose [OPTIONS]
 
 Options:
-  --app      <name>                App/process display name  (default: $PEEK_APP or "Receptacle")
-  --platform <macos|ios-sim|android>  Capture method         (default: $PEEK_PLATFORM or "macos")
+  --app      <name>                App/process display name  (default: $LASERGOOSE_APP or "ThunderSloth")
+  --platform <macos|ios-sim|android>  Capture method         (default: $LASERGOOSE_PLATFORM or "macos")
   --build    <xcode|spm|gradle|none>  Build before capture   (default: none)
   --scheme   <name>                Xcode scheme (for xcode build)
   --project  <path>                .xcodeproj/.xcworkspace/project dir path
   --hot                            Hot-reload instead of full build
-  --out      <path>                Output PNG path            (default: /tmp/peek.png)
+  --out      <path>                Output PNG path            (default: /tmp/lasergoose.png)
 ```
 
 ## Environment variables
@@ -41,42 +41,42 @@ Set these in `.envrc` or a shell alias so you never need to type flags:
 
 | Variable | Default | Description |
 |---|---|---|
-| `PEEK_APP` | `Receptacle` | App/process display name |
-| `PEEK_PLATFORM` | `macos` | Capture platform |
-| `PEEK_BUILD` | `none` | Build step |
-| `PEEK_SCHEME` | _(none)_ | Xcode scheme |
-| `PEEK_PROJECT` | _(none)_ | Project path |
-| `PEEK_OUT` | `/tmp/peek.png` | Output file |
+| `LASERGOOSE_APP` | `ThunderSloth` | App/process display name |
+| `LASERGOOSE_PLATFORM` | `macos` | Capture platform |
+| `LASERGOOSE_BUILD` | `none` | Build step |
+| `LASERGOOSE_SCHEME` | _(none)_ | Xcode scheme |
+| `LASERGOOSE_PROJECT` | _(none)_ | Project path |
+| `LASERGOOSE_OUT` | `/tmp/lasergoose.png` | Output file |
 
 ## Examples
 
 ```zsh
 # Screenshot only (app already running)
-peek --app Receptacle --platform macos
+lasergoose --app ThunderSloth --platform macos
 
 # Build then screenshot — Xcode
-peek --app Receptacle --platform macos \
+lasergoose --app ThunderSloth --platform macos \
      --build xcode \
-     --scheme ReceptacleApp \
-     --project ~/Developer/Receptacle/Receptacle/Receptacle.xcodeproj
+     --scheme ThunderSlothApp \
+     --project ~/Developer/ThunderSloth/ThunderSloth/ThunderSloth.xcodeproj
 
 # Build then screenshot — SPM CLI tool
-peek --app my-tool --platform macos \
+lasergoose --app my-tool --platform macos \
      --build spm \
      --project ~/Developer/my-tool
 
 # iOS Simulator (captures whatever app is on screen)
-peek --platform ios-sim
+lasergoose --platform ios-sim
 
 # Android Emulator — build, install, screenshot
-peek --app MyAndroidApp --platform android \
+lasergoose --app MyAndroidApp --platform android \
      --build gradle \
      --project ~/Developer/my-android-app
 
-# Receptacle alias (add to ~/.zshrc)
-alias peek-receptacle='peek --app Receptacle --platform macos --build xcode \
-  --scheme ReceptacleApp \
-  --project ~/Developer/Receptacle/Receptacle/Receptacle.xcodeproj'
+# ThunderSloth alias (add to ~/.zshrc, [project]/.env, or justfile)
+alias lasergoose-turboyak='lasergoose --app ThunderSloth --platform macos --build xcode \
+  --scheme ThunderSlothApp \
+  --project ~/Developer/ThunderSloth/ThunderSloth/ThunderSloth.xcodeproj'
 ```
 
 ## How it works
@@ -92,13 +92,13 @@ Uses a Swift one-liner (compiled and cached by the system on first run) to query
 ### iOS Simulator capture (`platforms/ios-sim.sh`)
 
 ```zsh
-xcrun simctl io booted screenshot /tmp/peek.png
+xcrun simctl io booted screenshot /tmp/lasergoose.png
 ```
 
 ### Android capture (`platforms/android.sh`)
 
 ```zsh
-adb exec-out screencap -p > /tmp/peek.png
+adb exec-out screencap -p > /tmp/lasergoose.png
 ```
 
 Uses `~/Library/Android/sdk/platform-tools/adb` (standard Android Studio location).
@@ -114,8 +114,8 @@ Incremental builds (`xcodebuild build`, `swift build`, `./gradlew assembleDebug`
 After each code change, Claude runs:
 
 ```zsh
-peek-receptacle
-# then reads /tmp/peek.png via the Read tool
+lasergoose-turboyak
+# then reads /tmp/lasergoose.png via the Read tool
 ```
 
 Claude analyses the image, applies the next diff, and repeats.
